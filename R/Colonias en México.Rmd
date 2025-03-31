@@ -134,3 +134,18 @@ library(extrafont)
 # activar showtext
 windowsFonts()
 ```
+
+## Objetivo  
+
+La **Delimitación de Colonias y otros Asentamientos Humanos (`DCAH`)** constituye una iniciativa fundamental del Instituto Nacional de Estadística y Geografía (`INEGI`) que tiene como propósito esencial la generación y mantenimiento de un sistema integral de información geográfica sobre los asentamientos humanos en el territorio mexicano. Este proyecto se desarrolla mediante un marco de colaboración estratégica con las autoridades municipales, quienes desempeñan un papel crucial en la delimitación precisa de estos espacios territoriales.
+
+La implementación del DCAH se sustenta en cuatro pilares fundamentales que garantizan su efectividad y relevancia institucional. 
+
+1. **Generación de información geográfica precisa:** El programa se centra en la generación de información geográfica de alta precisión, estableciendo un riguroso sistema de datos espaciales que refleja fielmente la realidad territorial de los asentamientos humanos en México. Este compromiso con la exactitud y la calidad de los datos representa la base sobre la cual se construyen todas las demás funciones del programa.
+
+2. **Análisis y la toma de decisiones:** Capacidad para facilitar procesos de análisis y toma de decisiones en múltiples ámbitos. La información generada por el DCAH se ha convertido en un recurso indispensable para la planificación urbana estratégica, la optimización en la gestión de servicios públicos, el desarrollo de investigaciones sociodemográficas y la formulación de políticas públicas basadas en evidencia. Esta versatilidad en su aplicación demuestra el valor multidimensional del programa.
+
+3. **Promover la colaboración interinstitucional:** Enfoque en la promoción de la colaboración interinstitucional. El INEGI ha establecido mecanismos efectivos de cooperación con las autoridades municipales, creando sinergias que aseguran tanto la calidad como la actualización continua de la información recopilada. Esta colaboración representa un modelo ejemplar de coordinación entre diferentes niveles de gobierno para el beneficio público.
+
+4. **Poner a disposición de la sociedad información relevante:** La democratización del acceso a la información. El INEGI ha implementado una política de transparencia y accesibilidad, poniendo a disposición del público general los datos del DCAH a través de su plataforma digital. Esta iniciativa no solo cumple con los principios de gobierno abierto, sino que también facilita el acceso a información valiosa para investigadores, planificadores urbanos y ciudadanos interesados.
+
