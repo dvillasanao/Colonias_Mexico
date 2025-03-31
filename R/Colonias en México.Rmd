@@ -115,16 +115,9 @@ require(kableExtra)
 require(openxlsx)
 require(readxl)
 require(rgdal)          #Para importar shapefiles. 
-require(unikn)          # Paleta de colores
-require(ggplot2)
-require(ggpubr)
-require(Hmisc)
-require(tidyverse)
-require(tibble)
-require(viridis)
-require(janitor)
-library(plotly)
-library(packcircles)
+require(sp)             # Classes and Methos for Spatial Data
+library(spdep)    # Índice de Moran 
+require(spdplyr)        #Data manipulation verbs for the sptial classes
 ```
 
 ```{r, echo = FALSE, results=FALSE}
@@ -169,3 +162,48 @@ La delimitación o actualización de los asentamientos humanos conforman a las l
 - Localidades cabeceras municipales.   
 - El resto de las localidades urbanas.   
 - El resto de las localidades rurales amanzanadas.   
+
+
+### Integración del conjunto de datos vectoriales de la capa de asentamientos humanos  
+
+```{r, echo = FALSE}
+require(gt)
+require(openxlsx)
+tabla <- read.xlsx("Bases/Estructura.xlsx")
+
+tabla %>% 
+ gt() %>%
+  tab_header(title = "Conjunto de datos vectoriales de la capa de asentamientos humanos",
+             subtitle = "Insituto Nacional de Estadística y Geografía") %>%
+   tab_footnote(footnote = "Fuente: INEGI. Delimitación de colonias y otros asentamientos humanos, 2024") %>%
+     tab_options(heading.title.font.size = 14, 
+                 heading.subtitle.font.size = 12,
+                 table.font.names = "Century Gothic",
+                 table.font.size = 10,
+                 data_row.padding = px(1)) %>%
+      tab_style(style = list(cell_text(align = "left",
+                                       weight = 'bold')),
+                locations = list(cells_title(groups = c("title")))) %>%
+       tab_style(style = list(cell_text(align = "left")),
+                 locations = list(cells_title(groups = c("subtitle")))) %>%
+        cols_width(starts_with("Contenido") ~ px(400),
+                   starts_with("Descripción") ~ px(200),
+                   everything() ~ px(80)) %>%
+         as_raw_html() 
+```
+
+
+## Shapefile
+
+La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a R manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\
+Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como `dsn`, en donde se indica el directorio que contiene los shapes y `layer` que es el nombre explícito de la capa a trabajar y dichas capas deben de ir sin la extensión `.shp`.
+
+A continuación, se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística `as`.
+
+```{r,results=FALSE,class.source = "fold-show"}
+shape_asentamientos <- readOGR(dsn ="D:/Colonias y Asentamientos/DCAH 2024/conjunto_de_datos", 
+                               layer = "00as",
+                                encoding = "UTF-8",
+                                 use_iconv = TRUE)
+```
+
