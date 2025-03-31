@@ -137,9 +137,9 @@ windowsFonts()
 
 ## Objetivo  
 
-La **Delimitación de Colonias y otros Asentamientos Humanos (`DCAH`)** constituye una iniciativa fundamental del Instituto Nacional de Estadística y Geografía (`INEGI`) que tiene como propósito esencial la generación y mantenimiento de un sistema integral de información geográfica sobre los asentamientos humanos en el territorio mexicano. Este proyecto se desarrolla mediante un marco de colaboración estratégica con las autoridades municipales, quienes desempeñan un papel crucial en la delimitación precisa de estos espacios territoriales.
+La **Delimitación de Colonias y otros Asentamientos Humanos (`DCAH`)** constituye una iniciativa del Instituto Nacional de Estadística y Geografía (`INEGI`) que tiene como propósito esencial la generación y mantenimiento de un sistema integral de información geográfica sobre los asentamientos humanos en el territorio mexicano. Este proyecto se desarrolló mediante un marco de colaboración estratégica con las autoridades municipales, quienes desempeñan un papel crucial en la delimitación precisa de estos espacios territoriales.
 
-La implementación del DCAH se sustenta en cuatro pilares fundamentales que garantizan su efectividad y relevancia institucional. 
+La implementación del `DCAH` se sustenta en cuatro pilares fundamentales que garantizan su efectividad y relevancia institucional. 
 
 1. **Generación de información geográfica precisa:** El programa se centra en la generación de información geográfica de alta precisión, estableciendo un riguroso sistema de datos espaciales que refleja fielmente la realidad territorial de los asentamientos humanos en México. Este compromiso con la exactitud y la calidad de los datos representa la base sobre la cual se construyen todas las demás funciones del programa.
 
@@ -147,5 +147,25 @@ La implementación del DCAH se sustenta en cuatro pilares fundamentales que gara
 
 3. **Promover la colaboración interinstitucional:** Enfoque en la promoción de la colaboración interinstitucional. El INEGI ha establecido mecanismos efectivos de cooperación con las autoridades municipales, creando sinergias que aseguran tanto la calidad como la actualización continua de la información recopilada. Esta colaboración representa un modelo ejemplar de coordinación entre diferentes niveles de gobierno para el beneficio público.
 
-4. **Poner a disposición de la sociedad información relevante:** La democratización del acceso a la información. El INEGI ha implementado una política de transparencia y accesibilidad, poniendo a disposición del público general los datos del DCAH a través de su plataforma digital. Esta iniciativa no solo cumple con los principios de gobierno abierto, sino que también facilita el acceso a información valiosa para investigadores, planificadores urbanos y ciudadanos interesados.
+4. **Poner a disposición de la sociedad información relevante:** La democratización del acceso a la información. El INEGI ha implementado una política de transparencia y accesibilidad, poniendo a disposición del público general los datos del DCAH a través de su plataforma digital. Esta iniciativa no solo cumple con los principios de gobierno abierto, sino que también facilita el acceso a información valiosa para investigadores, planificadores urbanos y ciudadanos interesados. 
 
+## Proposito   
+
+Proporcionar a las **Unidades de Estado (UE)** y a la sociedad en general un insumo que permita el análisis y estudios referidos a esta delimitación de colonias y otros asentamientos humanos, en temas geográficos, sociales, demográficos, económicos, culturales, históricos, políticos, entre otros.
+
+Se encuentran en formatos digitales, cabe aclarar que **aún no se cuenta con la cobertura a nivel nacional**, pero se cuenta con Delimitaciones de colonias y otros asentamientos humanos y conjuntos de datos vectoriales con los que se tiene el aval del Ayuntamiento municipal.
+
+Los archivos vectoriales se encuentran disponibles en formato Shape (`.shp`), los cuales pueden ser incorporados en sistemas de información geográfica (`SIG`). Mismo que se encuentran disponibles en la página oficial del [INEGI](https://www.inegi.org.mx/programas/dcah/#descargas)
+
+
+> **Asentamiento humano:** Es el establecimiento de un conglomerado demográfico, con el conjunto de sus sistemas de convivencia, en un área físicamente localizada considerando dentro de la misma los elementos naturales y las obras materiales que lo integran. También es un componente de referencia del **domicilio geográfico**.   
+
+**Delimitación de los asentamientos humanos**   
+
+La delimitación o actualización de los asentamientos humanos conforman a las localidades amanzanadas de la siguiente manera:    
+
+- Localidades con 50 000 habitantes o más y ciudades capitales.   
+- Conglomerados de localidades contiguas.  
+- Localidades cabeceras municipales.   
+- El resto de las localidades urbanas.   
+- El resto de las localidades rurales amanzanadas.   
