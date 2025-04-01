@@ -17,6 +17,12 @@ distribución y características de las colonias y asentamientos humanos
 en México a través de técnicas de análisis espacial y visualización de
 datos.
 
+<div style="display: flex; justify-content: center; gap: 10px;">
+
+<img src="Output/CDMX_OSM.png" width="70%" style="margin: 1px;">
+
+</div>
+
 ## Contenido del Repositorio
 
 - **`Bases/`**: Carpeta que contiene el shapefile DCAH original del
