@@ -114,10 +114,14 @@ require(knitr)
 require(kableExtra)
 require(openxlsx)
 require(readxl)
+require(ggplot)
+require(ggspatial)
 require(rgdal)          #Para importar shapefiles. 
 require(sp)             # Classes and Methos for Spatial Data
 library(spdep)    # Índice de Moran 
 require(spdplyr)        #Data manipulation verbs for the sptial classes
+require(ggpubr)
+require(unikn)
 ```
 
 ```{r, echo = FALSE, results=FALSE}
@@ -240,26 +244,6 @@ shape_municipios <- shape_municipios %>%
 ```
 
 
-```{r,results=FALSE,class.source = "fold-show"}
-shape_localidad <- readOGR(dsn ="D:/MGN/MGN 2024/conjunto_de_datos", 
-                           layer = "00l",
-                            encoding = "UTF-8",
-                             use_iconv = TRUE)  
-
-shape_localidad <- shape_localidad %>% 
-                    spTransform(., CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
-```
-
-```{r,results=FALSE,class.source = "fold-show"}
-shape_ageb <- readOGR(dsn ="D:/MGN/MGN 2024/conjunto_de_datos", 
-                       layer = "00a",
-                        encoding = "UTF-8",
-                         use_iconv = TRUE) 
-
-shape_ageb <- shape_ageb %>% 
-               spTransform(., CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
-```
-
 ## Delimitación de colonias y otros asentamientos humanos (`DCAH`)  
 
 ```{r, fig.height=8, fig.width=10, eval = FALSE, class.source = "fold-hide"}
@@ -299,92 +283,11 @@ ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
 
 Dado que a nivel nacional la delimitación de colonias no es representativo, dado que no se tienen datos. 
 
-```{r}
-limites <- shape_estados %>%
-            filter(CVEGEO %in% "09") %>% 
-             bbox()
-
-p <- ggplot() + 
-      layer_spatial(shape_asentamientos %>% filter(CVE_ENT %in% "09"), 
-                    aes(fill = TIPO), 
-                    color = "transparent", 
-                    linewidth = 0.005) + 
-       layer_spatial(shape_municipios %>% filter(CVE_ENT %in% "09"), fill = "transparent", color = "lightgrey",                            linewidth = 0.5) + 
-        layer_spatial(shape_estados %>% filter(CVE_ENT %in% "09"), fill = "transparent", color = "black") + 
-         theme_bw() + 
-          theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"),
-                plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
-                legend.key.size = unit(0.5, "cm"),
-                legend.text = element_text(size = 12, family = "Montserrat"), 
-                legend.title = element_text(size = 10, hjust = 0.5, family = "Montserrat", face = "bold"),
-                legend.position = "bottom",
-                legend.key.width = unit(3, "line"),
-                legend.key.height = unit(0.5, "line"),
-               ) + 
-          scale_fill_viridis_d(option = "A", begin = 0.3, end = 1) +
-           scale_color_viridis_d(option = "A", begin = 0.3, end = 1) +
-            coord_sf(xlim = c(limites['x', 'min'], limites['x', 'max']),
-                     ylim = c(limites['y', 'min'], limites['y', 'max'])) + 
-            guides(color = guide_legend(override.aes = list(fill = usecol(pal = pal_petrol, n = 5)))) +
-     labs(title = "Delimitación de colonias y otros asentamientos humanos (DCAH)",
-          fill = "",
-          color = "",
-          caption = expression(paste("Fuente: INEGI. Delimitación de colonias y otros asentamientos humanos, 2024")))
-p
-```
-
-
-## Áreas de los polígonos  
-
-# Se cálcula área en m² y se agrega al data.frame
-```{r}
-require(rgeos)
-#Nivel estatal 
-shape_estados@data$area_m2 <- gArea(shape_estados, byid = TRUE) 
-
-#Nivel municipal
-shape_municipios@data$area_m2 <- gArea(shape_municipios, byid = TRUE) 
-
-#Nivel localidad 
-shape_localidad@data$area_m2 <- gArea(shape_localidad, byid = TRUE) 
-
-#Nivel AGEB
-shape_ageb@data$area_m2 <- gArea(shape_ageb, byid = TRUE) 
-
-#Nivel asentamientos
-shape_asentamientos@data$area_m2 <- gArea(shape_asentamientos, byid = TRUE) 
-```
-
-Se convierten en $Km^2$
-
-```{r}
-#Nivel estatal 
-shape_estados <- shape_estados %>% 
-                  mutate(area_km2 = .$area_m2 / 1e6)
-
-#Nivel municipal
-shape_municipios <- shape_municipios %>% 
-                     mutate(area_km2 = .$area_m2 / 1e6)
-
-#Nivel localidad
-shape_localidad <- shape_localidad %>% 
-                    mutate(area_km2 = .$area_m2 / 1e6)
-
-#Nivel AGEB
-shape_ageb <- shape_ageb %>% 
-               mutate(area_km2 = .$area_m2 / 1e6)
-
-#Nivel Asentamientos
-shape_asentamientos <- shape_asentamientos %>% 
-                        mutate(area_km2 = .$area_m2 / 1e6)
-```
-
-### OpenStreetMap
+#### OpenStreetMap
 
 ```{r, eval = FALSE}
 library(osmdata)
 library(sf)
-library(ggplot2) 
 
 # Definir la ciudad de interés
 city <- "Ciudad de México"
@@ -398,7 +301,7 @@ saveRDS(viasosm, file = paste0(here::here(), "/Output/viasosm_cdmx.RDS"))
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 readRDS(file = paste0(here::here(), "/Output/viasosm_cdmx.RDS")) 
 
 viasosm_sf <- viasosm$osm_lines
@@ -410,41 +313,120 @@ cdmx <- shape_estados %>%
 cdmx <- spTransform(cdmx, CRS("+init=epsg:4326")) 
 
 #st_crs(viasosm_sf)  # Debe ser EPSG:4326
-#st_crs(cdmx)        # Puede ser diferente
-# Filtrar solo las calles principales 
+#st_crs(cdmx)        # Debe ser EPSG:4326 
+
+# Se filtran solo las calles principales 
 cdmx_sf <- st_as_sf(cdmx)
 
-recorteviasosm_sf <-viasosm_sf |> 
-                     st_intersection(cdmx_sf)
+viasosm_sf <-viasosm_sf |> 
+              st_intersection(cdmx_sf)
 
-recorteviasosm_sf <- recorteviasosm_sf %>% 
-                      filter(highway %in% c("primary", "secondary"))
+viasosm_sf <- viasosm_sf %>% 
+               filter(highway %in% c("primary", "secondary", "tertiary"))
 ```
 
-```{r}
-g <- ggplot() +
-  layer_spatial(shape_asentamientos %>% filter(CVE_ENT %in% "09"), 
-                    aes(fill = TIPO), 
-                    color = "transparent", 
+```{r, eval = FALSE, class.source = "fold-hide"}
+# Límites 
+limites <- shape_estados %>%
+            filter(CVEGEO %in% "09") %>% 
+             bbox()
+
+#paleta <- colorRampPalette(pals::kovesi.linear_bmw_5_95_c86(10))(5)
+paleta <- c("#00024B", "#190ED1", "#FEEBFE", "#FC81FD", "#B621FE")
+
+p <- ggplot() +
+      layer_spatial(shape_asentamientos %>% filter(CVE_ENT %in% "09"), 
+                    aes(fill = TIPO, color = "LINE1", linetype = "LINE1"),
                     linewidth = 0.005) + 
-       layer_spatial(shape_municipios %>% filter(CVE_ENT %in% "09"), fill = "transparent", color = "lightgrey",                            linewidth = 0.5) + 
-        layer_spatial(shape_estados %>% filter(CVE_ENT %in% "09"), fill = "transparent", color = "black") + 
-  geom_sf(data = recorteviasosm_sf, fill = NA, linewidth = 0.1) +
-  
-  labs(
-    title = "Colonias de la Ciudad de México"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 30)
-  ) + 
-          scale_fill_viridis_d(option = "A", begin = 0.3, end = 1) +
-           scale_color_viridis_d(option = "A", begin = 0.3, end = 1) +
-            coord_sf(xlim = c(limites['x', 'min'], limites['x', 'max']),
-                     ylim = c(limites['y', 'min'], limites['y', 'max'])) 
-g
+       layer_spatial(shape_municipios %>% filter(CVE_ENT %in% "09"), 
+                     aes(color = "LINE2", linetype = "LINE2"), 
+                     fill = "transparent",
+                     linewidth = 0.5) + 
+        layer_spatial(shape_estados %>% filter(CVE_ENT %in% "09"), 
+                      aes(color = "LINE3", linetype = "LINE3"), 
+                      fill = "transparent",
+                      linewidth = 1) + 
+         geom_sf(data = recorteviasosm_sf, fill = NA, linewidth = 0.2) +
+          theme_bw() + 
+           theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"),
+                 plot.subtitle = element_text(size = 16, hjust = 0.15, family = "Montserrat", face = "bold"),
+                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"),
+                 axis.text = element_text(family = "Montserrat"), 
+                 legend.key.size = unit(0.5, "cm"),
+                 legend.text = element_text(size = 10, family = "Montserrat"), 
+                 legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                 legend.position = "right") + 
+            scale_fill_manual(labels=c("Aeropueto", "Barrio", "Colonia", "Pueblo", "Zona Federal"),
+                              values = paleta) +
+             scale_color_manual(values = c("LINE1" = "white", "LINE2" = "lightgrey", "LINE3" = "black")) +
+              scale_linetype_manual(labels = c("Colonias", "Alcaldias", "Estado"),
+                                    values = c("LINE1" = "solid", "LINE2" = "solid", "LINE3" = "solid")) +
+               coord_sf(xlim = c(limites['x', 'min'], limites['x', 'max']),
+                        ylim = c(limites['y', 'min'], limites['y', 'max'])) + 
+                guides(color =  'none',
+                       linetype = guide_legend(override.aes = list(fill = NA, 
+                                                                   size = 1, 
+                                                                   linetype = c(1, 1, 1)))) +
+                 labs(title = "Colonias de la Ciudad de México", 
+                      subtitle = "Delimitación de colonias y otros asentamientos humanos (DCAH)",
+                      fill = "TIPO",
+                      linetype = "Delimitación",
+                      caption = expression(paste("Fuente: INEGI. Delimitación de colonias y otros asentamientos humanos, 2024")))
+      
+p
 
-path = "Output/CDMX_OSM.pdf"
-ggexport(g, filename = path ,width = 10, height = 10, device = "cairo")
+#path = "Output/CDMX_OSM.pdf"
+#ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
 ```
+
+![](../Output/CDMX_OSM.png){width="70%" fig-align="center"} 
+
+
+## Áreas de los polígonos  
+
+Se cálcula área en m² y se agrega al data.frame 
+
+```{r, eval = FALSE}
+require(rgeos)
+#Nivel estatal 
+shape_estados@data$area_m2 <- gArea(shape_estados, byid = TRUE) 
+
+#Nivel municipal
+shape_municipios@data$area_m2 <- gArea(shape_municipios, byid = TRUE) 
+
+#Nivel asentamientos
+shape_asentamientos@data$area_m2 <- gArea(shape_asentamientos, byid = TRUE) 
+```
+
+Se convierten en $Km^2$
+
+```{r, eval = FALSE}
+#Nivel estatal 
+shape_estados <- shape_estados %>% 
+                  mutate(area_km2 = .$area_m2 / 1e6)
+
+#Nivel municipal
+shape_municipios <- shape_municipios %>% 
+                     mutate(area_km2 = .$area_m2 / 1e6)
+
+#Nivel Asentamientos
+shape_asentamientos <- shape_asentamientos %>% 
+                        mutate(area_km2 = .$area_m2 / 1e6)
+```
+
+## Librerías
+
+**Librerías que se usaron en el trabajo**
+
+```{r, collapse=FALSE}
+sesion_info <- devtools::session_info()
+```
+
+```{r, echo = FALSE}
+kable(dplyr::select(tibble::as_tibble(sesion_info$packages %>% dplyr::filter(attached == TRUE)),
+                    c(package, loadedversion, source))) %>%
+   kable_classic(full_width = TRUE, html_font = "Montserrat", font_size = 10) 
+```
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
 
