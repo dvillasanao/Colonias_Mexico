@@ -5,12 +5,12 @@
 
 Este repositorio contiene un análisis exploratorio del shapefile de la
 Delimitación de Colonias y otros Asentamientos Humanos (`DCAH`)
-proporcionado por el INEGI.
+proporcionado por el `INEGI`.
 
 ## Descripción
 
 El objetivo principal de la Delimitación de Colonias y otros
-Asentamientos Humanos (DCAH) del INEGI es proporcionar información
+Asentamientos Humanos (`DCAH`) del `INEGI` es proporcionar información
 geográfica detallada y actualizada sobre la ubicación y extensión de las
 colonias y otros asentamientos humanos en México. Se busca comprender la
 distribución y características de las colonias y asentamientos humanos
