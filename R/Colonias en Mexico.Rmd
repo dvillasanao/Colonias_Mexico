@@ -535,9 +535,6 @@ readRDS(file = paste0(here::here(), "/Output/CDMX_Colonias.RDS"))
 ```
 
 
-
-
-
 ## Áreas de los polígonos  
 
 Se cálcula área en m² y se agrega al data.frame 
@@ -569,6 +566,7 @@ shape_municipios <- shape_municipios %>%
 shape_asentamientos <- shape_asentamientos %>% 
                         mutate(area_km2 = .$area_m2 / 1e6)
 ```
+
 
 ## Librerías
 
