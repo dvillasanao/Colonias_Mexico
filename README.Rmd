@@ -11,25 +11,35 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Colonias_Mexico
+# Delimitación de Colonias y Otros Asentamientos Humanos (`DCAH`) - INEGI  
 
-<!-- badges: start -->
-<!-- badges: end -->
+Este repositorio contiene un análisis exploratorio del shapefile de la Delimitación de Colonias y otros Asentamientos Humanos (`DCAH`) proporcionado por el INEGI.
 
-The goal of Colonias_Mexico is to ...
+## Descripción
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+El objetivo principal de la Delimitación de Colonias y otros Asentamientos Humanos (DCAH) del INEGI es proporcionar información geográfica detallada y actualizada sobre la ubicación y extensión de las colonias y otros asentamientos humanos en México. Se busca comprender la distribución y características de las colonias y asentamientos humanos en México a través de técnicas de análisis espacial y visualización de datos.
 
-```{r cars}
-summary(cars)
+## Contenido del Repositorio
+
+* **`Bases/`**: Carpeta que contiene el shapefile DCAH original del INEGI.
+* **`R/`**: Carpeta con scripts de R utilizados para el análisis y visualización de datos.
+* **`Output/`**: Carpeta donde se guardan los resultados del análisis, como gráficos y mapas.
+* **`README.md`**: Este archivo, que describe el proyecto.  
+
+
+## Requisitos
+
+Para ejecutar los scripts, se necesita tener instalado **R** y las siguientes librerías:
+
+``` r
+install.packages(c("sf", "spdep", "ggplot2", "tidyverse", "ggspatial"))
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
+## Resultados
 
-You can also embed plots, for example:
+**Enlace**: https://dvillasanao.github.io/Colonias_Mexico/Output/Colonias-en-México.html
 
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
+## Código de Conducta
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub.
+Por favor, revisa nuestro [Código de Conducta](CODE_OF_CONDUCT.md) antes de contribuir.
+
