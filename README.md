@@ -39,7 +39,7 @@ install.packages(c("sf", "spdep", "ggplot2", "tidyverse", "ggspatial"))
 ## Resultados
 
 **Enlace**:
-<https://dvillasanao.github.io/Colonias_Mexico/Output/Colonias-en-México.html>
+<https://dvillasanao.github.io/Colonias_Mexico/Output/Colonias-en-Mexico.html>
 
 ## Código de Conducta
 
