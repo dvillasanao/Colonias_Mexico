@@ -207,6 +207,12 @@ shape_asentamientos <- readOGR(dsn ="D:/Colonias y Asentamientos/DCAH 2024/conju
                                  use_iconv = TRUE)
 ```
 
+### Marco Geoestadístico Nacional   
+
+El Instituto Nacional de Estadística, Geografía e Informática (INEGI) tiene puestos a disposición del público los shapefiles con los distintos niveles de información geográfica. Estos archivos digitales se encuentran disponibles en el [`Marco Geoestadístico Nacional (MGN)`](https://www.inegi.org.mx/temas/mg/#Descargas), el cual es un sistema único y se presenta la división del territorio nacional en diferentes niveles de desagregación para referir geográficamente la información estadística de los censos y encuestas. Se integra al Sistema Nacional de Información Estadística y Geográfica (SNIEG).
+
+Este producto integra información vectorial, tablas de atributos y catálogos. Muestra la división geoestadística del territorio nacional en sucesivos niveles del territorio. Esta división está dada por los llamados **límites estadísticos**, que pueden coincidir con los límites político-administrativos oficiales, los cuales tienen sustento legal.
+
 
 A continuación, se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística municipal `agem`.
 
@@ -224,7 +230,7 @@ shape_municipios <- readOGR(dsn ="D:/MGN/MGN 2020/MGN 2020/conjunto_de_datos",
                                use_iconv = TRUE)
 ```
 
-
+## Delimitación de colonias y otros asentamientos humanos (`DCAH`)  
 
 ```{r, fig.height=8, fig.width=10, eval = FALSE, class.source = "fold-hide"}
 # Paleta de colores 
@@ -237,21 +243,23 @@ p <- ggplot() +
       layer_spatial(shape_asentamientos, aes(fill = CVE_ENT), color = "transparent") + 
        layer_spatial(shape_estados, fill = "transparent", color = "black") + 
         theme_bw() + 
-         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"),
+               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
                legend.key.size = unit(0.5, "cm"),
-               legend.text = element_text(size = 12, family = "montserrat"), 
-               legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+               legend.text = element_text(size = 12, family = "Montserrat"), 
+               legend.title = element_text(size = 10, hjust = 0.5, family = "Montserrat", face = "bold"),
                legend.position = "none"
                ) + 
           scale_fill_viridis_d(option = "A", begin = 0.3, end = 1) +
            scale_color_viridis_d(option = "A", begin = 0.3, end = 1) +
             guides(color = guide_legend(override.aes = list(fill = usecol(pal = pal_petrol, n = 5)))) +
-     labs(title = "Índice de marginación a nivel municipal, 2020",
-           fill = stringr::str_wrap("Grado de marginación", 10), 
-            caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+     labs(title = "Delimitación de colonias y otros asentamientos humanos (DCAH)",
+          fill = "",
+          color = "",
+          caption = expression(paste("Fuente: INEGI. Delimitación de colonias y otros asentamientos humanos, 2024")))
 p
-#path = "Output/Mapa del IMM2020.pdf"
-#ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
+path = "Output/Delmitación de colonias.pdf"
+ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
 ```
 
+![](../Output/Delmitación de colonias.png){width="70%" fig-align="center"}
