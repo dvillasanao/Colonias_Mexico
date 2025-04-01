@@ -202,7 +202,7 @@ tabla %>%
 La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a R manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\
 Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como `dsn`, en donde se indica el directorio que contiene los shapes y `layer` que es el nombre explícito de la capa a trabajar y dichas capas deben de ir sin la extensión `.shp`.
 
-A continuación, se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística `as`.
+A continuación, se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística de asentamientos `as`.
 
 ```{r,results=FALSE, class.source = "fold-show"}
 shape_asentamientos <- readOGR(dsn ="D:/Colonias y Asentamientos/DCAH 2024/conjunto_de_datos", 
@@ -244,14 +244,21 @@ shape_municipios <- shape_municipios %>%
 ```
 
 
-## Delimitación de colonias y otros asentamientos humanos (`DCAH`)  
+## Delimitación de colonias y otros asentamientos humanos (`DCAH`)   
+
+Se usa `ggplot2` y otros paquetes para visualizar shapefiles geoespaciales y se exportan la figura como un PDF.  
+
+- `RColorBrewer`: Paletas de colores.
+
+- `ggspatial`: Herramientas para mapas en `ggplot2`.
+
+- `ggpubr`: Funciones adicionales para `ggplot2`, como exportar gráficos.
 
 ```{r, fig.height=8, fig.width=10, eval = FALSE, class.source = "fold-hide"}
 # Paleta de colores 
 require(RColorBrewer)
 require(ggspatial)
 require(ggpubr)
-require(unikn)
 
 p <- ggplot() + 
       layer_spatial(shape_asentamientos, aes(fill = CVE_ENT), color = "transparent") +
@@ -266,7 +273,7 @@ p <- ggplot() +
                ) + 
           scale_fill_viridis_d(option = "A", begin = 0.3, end = 1) +
            scale_color_viridis_d(option = "A", begin = 0.3, end = 1) +
-            guides(color = guide_legend(override.aes = list(fill = usecol(pal = pal_petrol, n = 5)))) +
+            guides(color = 'none') +
      labs(title = "Delimitación de colonias y otros asentamientos humanos (DCAH)",
           fill = "",
           color = "",
@@ -279,9 +286,16 @@ ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
 ![](../Output/Delmitación de colonias.png){width="70%" fig-align="center"} 
 
 
-### Ciudad de México   
+### Ciudad de México    
 
-Dado que a nivel nacional la delimitación de colonias no es representativo, dado que no se tienen datos. 
+Dado que a nivel nacional la delimitación de colonias no es representativo. Se usa las librerías `osmdata` y `sf` para descargar y guardar datos de las vías de la **Ciudad de México** desde **OpenStreetMap** (`OSM`). 
+
+- `osmdata`: Permite obtener datos de OpenStreetMap.  
+- `sf`: Manejo de datos espaciales en formato `sf` (Simple Features).   
+
+Se obtiene las vías de **OpenStreetMap**. Utilizando la función `opq(city)`, crea una consulta para la Ciudad de México en OSM. 
+
+
 
 #### OpenStreetMap
 
@@ -289,13 +303,13 @@ Dado que a nivel nacional la delimitación de colonias no es representativo, dad
 library(osmdata)
 library(sf)
 
-# Definir la ciudad de interés
+# Se establece Ciudad de México como el área de consulta.
 city <- "Ciudad de México"
 
-# Obtener datos de vías de OpenStreetMap
-viasosm <- opq(city) %>% 
-            add_osm_feature(key = "highway") %>% 
-             osmdata_sf()
+# Obtener datos de vías de OpenStreetMap  
+viasosm <- opq(city) %>% ## Se crea una consulta para la Ciudad de México en OSM.
+            add_osm_feature(key = "highway") %>% ## Filtra las entidades relacionadas con carreteras/calles.
+             osmdata_sf() ##Se descarga los datos en formato sf.
 
 saveRDS(viasosm, file = paste0(here::here(), "/Output/viasosm_cdmx.RDS")) 
 ```
