@@ -122,6 +122,14 @@ library(spdep)    # Índice de Moran
 require(spdplyr)        #Data manipulation verbs for the sptial classes
 require(ggpubr)
 require(unikn)
+require(htmltools)
+require(leaflet)
+require(htmlwidgets)
+require(grDevices)
+require(leafgl)
+require(leaflet.extras)
+require(mapview)
+require(leaflet.providers)
 ```
 
 ```{r, echo = FALSE, results=FALSE}
@@ -142,9 +150,9 @@ La implementación del `DCAH` se sustenta en cuatro pilares fundamentales que ga
 
 2. **Análisis y la toma de decisiones:** Capacidad para facilitar procesos de análisis y toma de decisiones en múltiples ámbitos. La información generada por el DCAH se ha convertido en un recurso indispensable para la planificación urbana estratégica, la optimización en la gestión de servicios públicos, el desarrollo de investigaciones sociodemográficas y la formulación de políticas públicas basadas en evidencia. Esta versatilidad en su aplicación demuestra el valor multidimensional del programa.
 
-3. **Promover la colaboración interinstitucional:** Enfoque en la promoción de la colaboración interinstitucional. El INEGI ha establecido mecanismos efectivos de cooperación con las autoridades municipales, creando sinergias que aseguran tanto la calidad como la actualización continua de la información recopilada. Esta colaboración representa un modelo ejemplar de coordinación entre diferentes niveles de gobierno para el beneficio público.
+3. **Promover la colaboración interinstitucional:** Enfoque en la promoción de la colaboración interinstitucional. Se ha establecido mecanismos efectivos de cooperación con las autoridades municipales, creando sinergias que aseguran tanto la calidad como la actualización continua de la información recopilada. Esta colaboración representa un modelo ejemplar de coordinación entre diferentes niveles de gobierno para el beneficio público.
 
-4. **Poner a disposición de la sociedad información relevante:** La democratización del acceso a la información. El INEGI ha implementado una política de transparencia y accesibilidad, poniendo a disposición del público general los datos del DCAH a través de su plataforma digital. Esta iniciativa no solo cumple con los principios de gobierno abierto, sino que también facilita el acceso a información valiosa para investigadores, planificadores urbanos y ciudadanos interesados. 
+4. **Poner a disposición de la sociedad información relevante:** La democratización del acceso a la información. Se ha implementado una política de transparencia y accesibilidad, poniendo a disposición del público general los datos del DCAH a través de su plataforma digital. Esta iniciativa no solo cumple con los principios de gobierno abierto, sino que también facilita el acceso a información valiosa para investigadores, planificadores urbanos y ciudadanos interesados. 
 
 ## Proposito   
 
@@ -211,7 +219,7 @@ shape_asentamientos <- readOGR(dsn ="D:/Colonias y Asentamientos/DCAH 2024/conju
                                  use_iconv = TRUE)
 
 shape_asentamientos <- shape_asentamientos %>% 
-                        spTransform(., CRS("+proj=utm +zone=14 +datum=WGS84 +units=m +no_defs"))
+                        spTransform(., CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
 ```
 
 ### Marco Geoestadístico Nacional   
@@ -306,23 +314,24 @@ library(sf)
 # Se establece Ciudad de México como el área de consulta.
 city <- "Ciudad de México"
 
-# Obtener datos de vías de OpenStreetMap  
+# Se obtienen datos de vías de OpenStreetMap  
 viasosm <- opq(city) %>% ## Se crea una consulta para la Ciudad de México en OSM.
             add_osm_feature(key = "highway") %>% ## Filtra las entidades relacionadas con carreteras/calles.
              osmdata_sf() ##Se descarga los datos en formato sf.
 
-saveRDS(viasosm, file = paste0(here::here(), "/Output/viasosm_cdmx.RDS")) 
-```
-
-
-```{r, eval = FALSE}
+#saveRDS(viasosm, file = paste0(here::here(), "/Output/viasosm_cdmx.RDS")) 
 readRDS(file = paste0(here::here(), "/Output/viasosm_cdmx.RDS")) 
 
+# Se extraen las líneas de las vías de OSM
 viasosm_sf <- viasosm$osm_lines
-st_crs(viasosm_sf) <- 4326
 
+# Se define el sistema de referencia espacial (CRS)
+st_crs(viasosm_sf) <- 4326 ## sistema de coordenadas EPSG:4326
+
+# Se filtra la Ciudad de México en shape_estados
 cdmx <- shape_estados %>% 
-         filter(CVEGEO %in% "09")
+         filter(CVEGEO %in% "09") 
+
 # Transformar CRS a EPSG:4326 si no está en ese sistema
 cdmx <- spTransform(cdmx, CRS("+init=epsg:4326")) 
 
@@ -330,11 +339,13 @@ cdmx <- spTransform(cdmx, CRS("+init=epsg:4326"))
 #st_crs(cdmx)        # Debe ser EPSG:4326 
 
 # Se filtran solo las calles principales 
-cdmx_sf <- st_as_sf(cdmx)
+cdmx_sf <- st_as_sf(cdmx) ## Se convierte cdmx en formato sf
 
+# Se recorta las calles dentro de la Ciudad de México
 viasosm_sf <-viasosm_sf |> 
-              st_intersection(cdmx_sf)
+              st_intersection(cdmx_sf) 
 
+# Se filtra solo calles principales
 viasosm_sf <- viasosm_sf %>% 
                filter(highway %in% c("primary", "secondary", "tertiary"))
 ```
@@ -370,7 +381,7 @@ p <- ggplot() +
                  legend.text = element_text(size = 10, family = "Montserrat"), 
                  legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                  legend.position = "right") + 
-            scale_fill_manual(labels=c("Aeropueto", "Barrio", "Colonia", "Pueblo", "Zona Federal"),
+            scale_fill_manual(labels=c("Aeropuerto", "Barrio", "Colonia", "Pueblo", "Zona Federal"),
                               values = paleta) +
              scale_color_manual(values = c("LINE1" = "white", "LINE2" = "lightgrey", "LINE3" = "black")) +
               scale_linetype_manual(labels = c("Colonias", "Alcaldias", "Estado"),
@@ -393,7 +404,138 @@ p
 #ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
 ```
 
-![](../Output/CDMX_OSM.png){width="70%" fig-align="center"} 
+![](../Output/CDMX_OSM.png){width="70%" fig-align="center"}  
+
+### Leaflet  
+
+
+#### Título  
+
+Se define el estilo y el contenido de un título para un mapa Leaflet utilizando `HTML` y `CSS` dentro de `R`.    
+
+- `tags$style(HTML("..."))`: Esta función permite incluir estilos CSS en el documento.   
+- `.leaflet-control.map-title`: Define una clase CSS que se aplicará al título del mapa.  
+- `tags$div(...)`: Crea un contenedor div en el cual se coloca el título del mapa.  
+- `tag.map.title`: Aplica los estilos definidos anteriormente a este contenedor div.  
+
+
+```{r, eval = FALSE, class.source = "fold-show"}
+# Estructura del título
+tag.map.title <- tags$style(HTML("
+  .leaflet-control.map-title { 
+    transform: translate(-50%,20%);
+    position: fixed !important;
+    left: 50%;
+    text-align: center;
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: rgba(255,255,255,0.75);
+    font-weight: bold;
+    font-size: 28px;
+  }
+ ")) 
+
+# Nota de página
+title <- tags$div(
+  tag.map.title, HTML("Fuente: INEGI. Delimitación de colonias y otros asentamientos humanos, 2024")
+)  
+```
+
+#### Límites del mapa    
+
+Se calcula el cuadro delimitador que contiene las coordenadas de los límitesde un objeto espacial utilizando la función `st_bbox()` de la librería `sf`.     
+
+- `xmin`: La coordenada mínima en el eje x (longitud mínima).   
+- `ymin`: La coordenada mínima en el eje y (latitud mínima).   
+- `xmax`: La coordenada máxima en el eje x (longitud máxima).   
+- `ymax`: La coordenada máxima en el eje y (latitud máxima).  
+
+```{r, eval = FALSE, class.source = "fold-show"}
+bounding_box <- st_bbox(shape_estados %>% filter(CVE_ENT %in% "09"))
+bounding_box
+```
+
+
+```{r, eval = FALSE, class.source = "fold-hide"} 
+paleta <- colorRampPalette(pals::kovesi.linear_bmw_5_95_c86(10))(5)
+paleta <- c("#FEEBFE", "#FC81FD", "#B621FE", "#190ED1", "#00024B")
+
+mypalette <- leaflet::colorFactor(palette = paleta, 
+                                  domain = forcats::fct_relevel(shape_asentamientos@data$TIPO,
+                                                                c("Aeropuerto", "Barrio", "Colonia", "Pueblo", "Zona Federal")),
+                                  na.color = "transparent")
+
+map <- leaflet(options = leafletOptions(minZoom = 7, maxZoom = 15, zoomControl = FALSE)) %>%
+        addMapPane("estados", zIndex = 430) %>% # shown above ames_lines  
+         addMapPane("layer1", zIndex = 420) %>% # shown below
+          addMapPane("layer2", zIndex = 420) %>% # shown below
+           addTiles() %>% 
+            setView(lat = 19.355, lng = -99.2, zoom = 10) %>%
+             setMaxBounds(lng1 = bounding_box[1],
+                          lat1 = bounding_box[2],
+                          lng2 = bounding_box[3],
+                          lat2 = bounding_box[4]) %>%
+             addProviderTiles(providers$OpenStreetMap, 
+                              options = providerTileOptions(minZoom = 5, maxZoom = 5)) %>%
+              addPolygons(data = shape_estados %>% filter(CVE_ENT %in% "09"),
+                          fill = NA,
+                          stroke = TRUE, # Dibujar los bordes del polígono
+                          weight = 1.5,  # line thickness
+                          dashArray = "1",
+                          opacity = 1,
+                          color = "black",  # line colour 
+                          highlight = highlightOptions(weight = 2,
+                                                       color = "red", # Color de selección
+                                                       dashArray = "",
+                                                       fillOpacity = 0.6,
+                                                       bringToFront = TRUE),
+                          options = pathOptions(pane = "layer1")) %>%
+               addPolygons(data = shape_municipios %>% filter(CVE_ENT %in% "09"),
+                           fill = NA,
+                           popup = ~NOMGEO,
+                           stroke = TRUE, # Dibujar los bordes del polígono
+                           weight = 1,  # line thickness
+                           dashArray = "1",
+                           opacity = 1,
+                           color = "grey",  # line colour 
+                           highlight = highlightOptions(weight = 2,
+                                                        color = "red", # Color de selección
+                                                        dashArray = "",
+                                                        fillOpacity = 0.6,
+                                                        bringToFront = TRUE),
+                           options = pathOptions(pane = "layer2")) %>%
+               addPolygons(data = shape_asentamientos %>% filter(CVE_ENT %in% "09"),
+                           fillColor = ~mypalette(TIPO),
+                           fillOpacity = 0.6,
+                           stroke = TRUE, # Dibujar los bordes del polígono
+                           popup = ~NOM_ASEN,
+                           weight = 0.005,  # line thicknes
+                           dashArray = "1",
+                           opacity = 1,
+                           color = "black",  # line colour 
+                           highlight = highlightOptions(weight = 2,
+                                                        color = "red", # Color de selección
+                                                        dashArray = "",
+                                                        fillOpacity = 0.6,
+                                                        bringToFront = TRUE),
+                           options = pathOptions(pane = "layer1"))  %>%
+                addControl(title, position = "bottomright") %>%
+                 addLegend("bottomright", 
+                           colors = paleta, 
+                           labels = c("Aeropuerto", "Barrio", "Colonia", "Pueblo", "Zona Federal"),
+                           values = ~forcats::fct_relevel(shape_asentamientos@data$TIPO, c("Aeropueto", "Barrio", "Colonia", "Pueblo", "Zona Federal")),
+                           title = stringr::str_wrap("Tipo", 15), opacity = 0.7) 
+
+map
+```
+
+```{r, echo = FALSE}
+#saveRDS(map, file = paste0(here::here(), "/Output/CDMX_Colonias.RDS"))
+readRDS(file = paste0(here::here(), "/Output/CDMX_Colonias.RDS"))
+```
+
+
+
 
 
 ## Áreas de los polígonos  
